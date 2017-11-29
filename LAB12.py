@@ -16,23 +16,23 @@
 # Lose Condition for Game:  Do more than twenty room changes
 # Secret room.  Use the matches, if you find them, to light up the dark room, reveals a new secret room
 
-
-#TODO Major bug, cannot find out why secret room always crashes when exiting the secret room.
-#TODO find a solution so that it doesn't automatically print the room details when help or map is entered
-#TODO Note that every time the user is prompted to press enter, they MUST have the... 
-# ...ability to EXIT or press HELP according to instructions... this needs fixed.
-#TODO MAJOR BUG!!! Why is the secret room crashing the program?  Can't get out of the secret room.
-#TODO see if maxRoomChanges variable can be chagned to a CONSTANT variable 
+import time
 
 def map():  # Serves as the additional feature required per classroom instruction
     """ Prints map of the cave """
     """ Map can only be read in rooms with sufficient lighting """
-    printNow('************************')
-    printNow('MAP OF CAVE:')
-    printNow("[startRoom]    -  [darkRoom]  -  [islandRoom]")
-    printNow("     |                                  |")
-    printNow("[skeletonRoom] -  [batRoom]")
-    printNow('************************')
+    #display the map, one room per second
+    i = 0
+    mapArray = ['[startRoom]',' - ', '[darkRoom]',  '-',  '[islandRoom]\n',
+                '         |    ','\t\t |\n','[skeletonRoom]','-','[batRoom]']
+          
+    while i < 10:
+      sys.stdout.write("\r%s" % mapArray[i])
+      sys.stdout.flush()
+      sleep(1)
+      i += 1 
+    showInformation('There are five rooms plus.... one secret room')            
+    print ''    
 
 
 def getHelp():
@@ -111,9 +111,9 @@ def darkRoom(acceptableCommands):
     return userCommand
 
 def secretRoom(acceptableCommands):
-    #""" one of the rooms
-    #    :return userCommand (string) the command typed by the user
-    #"""
+    """ one of the rooms
+        :return userCommand (string) the command typed by the user
+    """
     description = 'SECRET ROOM!\nWow this room is not on map.  There is a commodore 64 computer in this room!\n' \
                   'If you play the game War Games(WOPR) on this you might accidentally break into NORAD!\n' \
                   'Best to leave this secret room alone!'
@@ -137,7 +137,8 @@ def batRoom(acceptableCommands):
         :return userCommand (string) the command typed by the user
     """
     description = 'BATROOM!\n The walls of the cavern are filled with thousands of hanging bats\n ' \
-                  'It smells of bat guano... Yuck.\nAnother explorer left their pack here with a bunch of matches!'
+                  'It smells of bat guano... Yuck.\n'\
+                  'Another explorer left their pack here with a bunch of matches!'
     printDetails(description)
     userCommand = getCommand(acceptableCommands)#['LEFT', 'UP']
     return userCommand
@@ -152,13 +153,14 @@ def islandRoom(acceptableCommands):
     printDetails(description)
     userCommand = getCommand(acceptableCommands)#['LEFT']
     return userCommand
-
+  
 
 def main():
     """main function, starts the game """
 
     printNow (welcomeMessage())
-    requestString('Press ENTER to contine...')
+    showInformation('Lets Get Started!')
+    
     x = 0  # represents an x cartestian coordinate
     y = 0  # represents a y cartestian coordinate
     
@@ -168,7 +170,8 @@ def main():
     hasRope = false #changes to true if user picks up rope
     secretRoomAccess = false #user can only gain access to secret room by lighting a match in the dark room
     roomChanges = 0 #If room changes exceeds maxRoomChanges, you lose the game
-    maxRoomChanges = 20 #Lose condition if you exceed maxRoomChanges   
+    maxRoomChanges = 20 #Lose condition if you exceed maxRoomChanges  
+    currentRoom = ''
     # Get input from user by calling the room functions.  Input will be specific to each room
     while true:
 
@@ -176,9 +179,11 @@ def main():
           if hasRope == false:
             userCommand = startRoom(['RIGHT', 'DOWN'])
           else:
-            userCommand = startRoom(['RIGHT', 'DOWN', 'CLIMBOUT'])            
+            userCommand = startRoom(['RIGHT', 'DOWN', 'CLIMBOUT'])     
+                   
         elif x == 0 and y == -1:
-            userCommand = skeletonRoom(['UP', 'RIGHT'])
+          userCommand = skeletonRoom(['UP', 'RIGHT'])
+            
         elif x == 1 and y == 0:
          if secretRoomAccess == true:
            userCommand = darkRoom(['RIGHT', 'DOWN', 'LEFT', 'UP'])
@@ -186,62 +191,54 @@ def main():
            userCommand = darkRoom(['RIGHT', 'DOWN', 'LEFT', 'STRIKEMATCH'])
          else:
            userCommand = darkRoom(['RIGHT', 'DOWN', 'LEFT'])
+           
         elif x == 1 and y == 1:
-          secretRoom(['DOWN'])       
+          currentRoom = 'Secret Room'
+          userCommand = secretRoom(['DOWN'])  
+               
         elif x == 2 and y == 0:
           if hasRope == false:    
             userCommand = islandRoom(['LEFT','GETROPE'])
           else:
-            userCommand = islandRoom(['LEFT'])   
+            userCommand = islandRoom(['LEFT'])  
+            
         elif x == 1 and y == -1:
           if hasMatches == true:  
             userCommand = batRoom(['LEFT', 'UP'])
           else:
             userCommand = batRoom(['LEFT', 'UP', 'GETMATCHES'])
-                        
 
         # Process off of what user input or userCommand is
         if userCommand == 'HELP':
             getHelp()
-            requestString('Press ENTER to contine...') #TODO change to end of while
+            showInformation("Press OK to Continue") 
         elif userCommand == 'EXIT':
             print("Even though you are a quiter, thank you for playing!")
             return  # effectively exit the program
+            
         elif userCommand == 'MAP':
             if x == 1 and y == 0:
-                printNow('************************')
-                printNow('You cannot read your map in the Dark Room... Too dark!')
-                printNow('************************')
-                requestString('Press ENTER to contine...')#TODO change to end of while
+                showInformation('You cannot read your map in the Dark Room... Too dark!')
             else:
-                map() #Display the map to the console
-                requestString('Press ENTER to contine...')#TODO change to end of while
+             map()
+             
         elif userCommand == 'GETMATCHES':
-          printNow('************************')
-          printNow('You have picked up several matches!')
-          printNow('************************')
-          requestString('Press ENTER to contine...')#TODO change to end of while
+          showInformation('You have picked up several matches!')
           hasMatches = true
+          
         elif userCommand == 'STRIKEMATCH':
-          printNow('************************')
-          printNow('After stirking the match, you see a secret room hidden in the shadows!')
-          printNow('You can now enter the secret room!')
-          printNow('************************')
-          requestString('Press ENTER to contine...')#TODO change to end of while  
+          showInformation('After stirking the match, you see a secret room hidden in the shadows!'\
+                                  'You can now enter the secret room!')
           secretRoomAccess = true #Now user can access secret room  
+          
         elif userCommand == 'GETROPE':
-          printNow('************************')
-          printNow('You have picked up rope!')
-          printNow('You can use rope to climb!')
-          printNow('************************')
+          showInformation('You have picked up rope!\nYou can use rope to climb!')
           hasRope = true
-          requestString('Press ENTER to contine...')#TODO change to end of while   
+          
         elif userCommand == 'CLIMBOUT':
-          printNow('************************')
-          printNow('YOU WIN! You use the rope to climb out!')
-          printNow('You have survived the game!')
-          printNow('************************')   
-          return #end of game, user has won               
+          showInformation('YOU WIN! You use the rope to climb out\n!You have survived the game!')
+          return #end of game, user has won   
+                      
         elif userCommand == 'UP':
             y += 1
             roomChanges += 1 
