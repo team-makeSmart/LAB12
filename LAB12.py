@@ -9,7 +9,7 @@
 # or confused, there is a map or a help description available.
 # MAP OF CAVE
 #  [startRoom]    -  [darkRoom]  -  [islandRoom]
-#      |                                   |
+#      |                 |
 #  [skeletonRoom] -  [batRoom]
 #
 # Win Condition for Game:  Get the rope from the island room and use it to climb out of the cave
@@ -23,13 +23,13 @@ def map():  # Serves as the additional feature required per classroom instructio
     """ Map can only be read in rooms with sufficient lighting """
     #display the map, one room per second
     i = 0
-    mapArray = ['[startRoom]',' - ', '[darkRoom]',  '-',  '[islandRoom]\n',
-                '         |    ','\t\t |\n','[skeletonRoom]','-','[batRoom]']
-          
+    mapArray = ['[startRoom]',' - ', '[darkRoom]',  ' - ',  '[islandRoom]\n',
+                '     |    ','\t    |\n','[skeletonRoom]',' - ','[batRoom]\n']
+    #Below while loop will print the map slowly for effect       
     while i < 10:
       sys.stdout.write("\r%s" % mapArray[i])
       sys.stdout.flush()
-      sleep(1)
+      time.sleep(1)
       i += 1 
     showInformation('There are five rooms plus.... one secret room')            
     print ''    
